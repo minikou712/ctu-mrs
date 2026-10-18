@@ -36,19 +36,13 @@ class MrimPlanner:
 
         ## |  load parameters from ROS custom config (mrim_task/mrim_planner/config/custom_config.yaml)  |
         self._viewpoints_distance    = rospy.get_param('~viewpoints/distance', 3.0)
-        # [v1.1 新增] 连续轨迹的dt样本仍需覆盖巡检位姿容差。
-        self._inspection_position_tolerance = rospy.get_param('~viewpoints/inspection_limits/distance', 0.3)
-        self._inspection_heading_tolerance = rospy.get_param('~viewpoints/inspection_limits/heading', 0.2)
         self._plot                     = rospy.get_param('~problem/plot', False)
         self._trajectory_dt            = rospy.get_param('~trajectories/dt', 0.2)
         self._smoothing_sampling_step  = rospy.get_param('~path_smoothing/sampling_step', 0.1)
         self._smoothing_distance       = rospy.get_param('~path_smoothing/lookahead_dist', 0.3)
         self._sample_with_stops        = rospy.get_param('~trajectory_sampling/with_stops', True)
         self._global_frame             = rospy.get_param('~global_frame', "gps_origin")
-        # [v1.1 原代码保留] 第3步：默认使用预计任务时间均衡分配。
-        # self._tsp_clustering_method    = rospy.get_param('~tsp/clustering', 'random')
-        # [v1.1 新实现] 第3步：默认使用预计任务时间均衡分配。
-        self._tsp_clustering_method    = rospy.get_param('~tsp/clustering', 'balanced')
+        self._tsp_clustering_method    = rospy.get_param('~tsp/clustering', 'random')
 
         max_vel_x                      = rospy.get_param('~dynamic_constraints/max_velocity/x', 1.0)
         max_vel_y                      = rospy.get_param('~dynamic_constraints/max_velocity/y', 1.0)
@@ -78,11 +72,7 @@ class MrimPlanner:
         if pp_method == 'astar' or de_method == 'astar':
             self._path_planner['astar/grid_resolution'] = rospy.get_param('~path_planner/astar/grid_resolution')
         if pp_method.startswith('rrt') or de_method.startswith('rrt'):
-            # [v1.1 原代码保留] 第6步：可配置RRT目标偏置。
-            # self._path_planner['rrt/branch_size']      = rospy.get_param('~path_planner/rrt/branch_size')
-            # [v1.1 新实现] 第6步：可配置RRT目标偏置。
             self._path_planner['rrt/branch_size']      = rospy.get_param('~path_planner/rrt/branch_size')
-            self._path_planner['rrt/goal_bias']        = rospy.get_param('~path_planner/rrt/goal_bias', 0.1)
             self._path_planner['rrt/sampling/method']  = rospy.get_param('~path_planner/rrt/sampling/method')
             self._path_planner['rrtstar/neighborhood'] = None
 
@@ -143,16 +133,7 @@ class MrimPlanner:
 
         ## | ----- initialize objects for TSP and trajectory utils ---- |
         tsp_solver       = TSPSolver3D()
-        # [v1.1 原代码保留] 第5、14—16步：为平滑和采样提供障碍及边界复查。
-        # trajectory_utils = TrajectoryUtils(self._max_velocity, self._max_acceleration, self._trajectory_dt)
-        # [v1.1 新实现] 第5、14—16步：为平滑和采样提供障碍及边界复查。
         trajectory_utils = TrajectoryUtils(self._max_velocity, self._max_acceleration, self._trajectory_dt)
-        # [v1.1 新增] 平滑曲线及最终采样复查，包含凹多边形边界。
-        from path_planners.geometry import EnvironmentValidator
-        trajectory_utils.spatial_validator = EnvironmentValidator(
-            problem, self._path_planner['safety_distance'])
-        trajectory_utils.inspection_position_tolerance = self._inspection_position_tolerance
-        trajectory_utils.inspection_heading_tolerance = self._inspection_heading_tolerance
 
         # # #{ Cluster target locations
 
@@ -183,13 +164,12 @@ class MrimPlanner:
                     nonclustered_vps.append(viewpoint)
 
         # Cluster the rest of the viewpoints into two separate groups
-        # [v1.1 原代码保留] 第3步：为任务分配提供当前动力学与观察距离。
+        # [v1.1 原代码保留] 旧调用没有传入每架无人机已有任务。
         # clusters = tsp_solver.clusterViewpoints(problem, nonclustered_vps, method=self._tsp_clustering_method)
-        # [v1.1 新实现] 第3步：为任务分配提供当前动力学与观察距离。
+        # [v1.1 新实现] 第3步：将起点和已分配的专属目标交给负载分配方法。
         clusters = tsp_solver.clusterViewpoints(
             problem, nonclustered_vps, method=self._tsp_clustering_method,
-            max_velocity=self._max_velocity, max_acceleration=self._max_acceleration,
-            viewpoint_distance=self._viewpoints_distance)
+            assigned_viewpoints=viewpoints)
         for r in range(problem.number_of_robots):
             viewpoints[r].extend(clusters[r])
 
