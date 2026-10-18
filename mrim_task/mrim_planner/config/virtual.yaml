@@ -4,18 +4,23 @@ problem:
 
 # Parameters for Traveling Salesman Problem
 tsp:
-  clustering: 'random'            # [STUDENTS TODO: implement better method than the default] Clustering method of viewpoints: [random (default), kmeans]
+  # [v1.1 原代码保留] clustering: 'random'            # [STUDENTS TODO: implement better method than the default] Clustering method of viewpoints: [random (default), kmeans]
+  # [v1.1] 按预计完工时间与既有专属任务均衡分配；可选random / kmeans / balanced。
+  clustering: 'balanced'
   distance_estimates: 'euclidean' # Method for evaluating cost of paths in TSP heuristic: [euclidean (default), astar, rrt, rrtstar]
 
 # Parameters for path planning
 path_planner:
   timeout: 60.0              # (s) timeout for single start-to-goal planning
   method: 'rrt'              # [STUDENTS TODO: implement better method than the default] Method for generating start-to-goal paths: [euclidean, astar, rrt (default), rrtstar]
-  straighten_paths: false    # [STUDENTS TODO: implement better method than the default] Path straightening flag (default: false)
+  # [v1.1 原代码保留] straighten_paths: false    # [STUDENTS TODO: implement better method than the default] Path straightening flag (default: false)
+  # [v1.1] 每对观察点之间执行安全捷径，不跨段删除巡检位姿。
+  straighten_paths: true
 
   # RRT and RRT* method parameters
   rrt:
     branch_size: 3.0 # (m)
+    goal_bias: 0.1 # [v1.1 新增] 10%概率向目标扩展，剩余概率探索空间。
     sampling:
       method: 'uniform' # [STUDENTS TODO: implement better method than the default] Method for sampling random points: [uniform (default), gaussian]
       gaussian:
@@ -34,7 +39,9 @@ path_smoothing:
 
 # Parameters for sampling the UAVs' trajectories [TIP: do path straightening before attempting parametrization]
 trajectory_sampling:
-  with_stops: true # [STUDENTS TODO: implement better method than the default] If true, UAVs will stop at each waypoint (default: true)
+  # [v1.1 原代码保留] with_stops: true # [STUDENTS TODO: implement better method than the default] If true, UAVs will stop at each waypoint (default: true)
+  # [v1.1] 尝试保留观察位姿的TOPPRA连续轨迹；不可行或复查失败时回退停车。
+  with_stops: false
 
 # Parameters for UAV-to-UAV collision avoidance
 collision_avoidance:

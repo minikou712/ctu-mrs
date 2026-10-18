@@ -1,0 +1,31 @@
+{
+  "problem": "apocalypse_small.problem",
+  "seed": 0,
+  "inspection_score": 8,
+  "inspection_points": 8,
+  "robots": [
+    {
+      "robot_id": 1,
+      "samples": 127,
+      "sampling_mode": "continuous",
+      "sample_intervals_seconds": 25.200000000000003,
+      "length_meters": 95.46359186689476,
+      "max_velocity_limit_ratio": 0.9936366666706276,
+      "max_acceleration_limit_ratio": 0.9873123523268745
+    },
+    {
+      "robot_id": 2,
+      "samples": 163,
+      "sampling_mode": "fallback_stops",
+      "sample_intervals_seconds": 32.4,
+      "length_meters": 88.65598491843998,
+      "max_velocity_limit_ratio": 0.9935639880952385,
+      "max_acceleration_limit_ratio": 0.9871693984397356
+    }
+  ],
+  "continuous_fallback_count": 1,
+  "minimum_mutual_sample_distance_meters": 2.494392987004209,
+  "mutual_check_threshold_meters": 2.5,
+  "mutual_samples_pass": false,
+  "scope": "真实规划与原评分算法；ROS消息替身；未运行ROS/MRS仿真"
+}

@@ -2,7 +2,8 @@
 <package format="2">
 
   <name>mrim_planner</name>
-  <version>1.0.0</version>
+  <!-- [v1.1 原代码保留] <version>1.0.0</version> -->
+  <version>1.1.0</version>
   <description>The MRIM Summer School 2025 planner</description>
 
   <author email="pavel.petracek@fel.cvut.cz">Pavel Petracek</author>

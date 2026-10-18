@@ -1,5 +1,7 @@
 # MRS Summer School 2026: Multi-Robot Disaster Monitoring and Search in a Post-Disaster Environment
 
+中文资料：[项目架构导读](PROJECT_ARCHITECTURE.zh-CN.md) · [version1.1 更新与验证记录](VERSION_1.1.md)。
+
 In this Summer School task, we will focus on the cooperation of a group of two UAVs (Unmanned Aerial Vehicles) in a 3D environment with obstacles.
 The task is to plan collision-free trajectories of the UAVs so that cameras onboard the UAVs locate and observe a set of *N* unique inspection points representing possible human survivors, victims, or critical objects in a disaster-affected environment.
 Both UAVs have a predefined starting position and a limit on maximal velocity and acceleration.
